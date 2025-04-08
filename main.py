@@ -1,21 +1,15 @@
-import openai
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
-
 import os
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": user_message}]
-    )
-    reply = response['choices'][0]['message']['content']
-    await update.message.reply_text(reply)
-
-app = ApplicationBuilder().token(os.getenv("TELEGRAM_TOKEN")).build()
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-app.run_polling()
+from dotenv import load_dotenv
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from openai import OpenAIApi
+load_dotenv()
+openai = OpenAIApi(os.getenv("OPENAI_API_KEY"))
+def start(update, context):
+update.message.reply_text("Привет! Я - OpenAI-бот для Telegram. Задай мне вопрос!")
+def chatgpt(update, context):
+query = update.message.text
+response = openai.
+chat(“ChatGPT”, query)
+update.message.reply_html(response[‘choices’][0][‘text’])
+updater = Updater(token=os.getenv(‘TELEGRAM_BOT_TOKEN’), use_context=True)
+dispatcher = updater.dispatcher
